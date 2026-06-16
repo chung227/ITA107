@@ -212,40 +212,34 @@ def demo_longest_consecutive_days():
 # ============================================================
 
 def count_revenue_windows(revenues, k):
- 
-    prefix_count = {0: 1}
-    prefix_sum = 0
     count = 0
+    n = len(revenues)
 
-    for revenue in revenues:
-        prefix_sum += revenue
-        need = prefix_sum - k
+    for i in range(n):
+        total = 0
+        for j in range(i, n):
+            total += revenues[j]
 
-        if need in prefix_count:
-            count += prefix_count[need]
-
-        if prefix_sum not in prefix_count:
-            prefix_count[prefix_sum] = 0
-
-        prefix_count[prefix_sum] += 1
+            if total <= k:
+                count += 1
 
     return count
 
 
-def demo_count_revenue_windows():
-    """
-    Demo yêu cầu 2.4.
-    """
-    print("\n===== DEMO 2.4: SUBARRAY SUM = K =====")
+def count_revenue_windows(revenues, k):
+    prefix_sum = 0
+    freq = {0: 1}
+    count = 0
 
-    revenues = [100, 200, 300, 100, 200]
-    k = 300
+    for x in revenues:
+        prefix_sum += x
 
-    result = count_revenue_windows(revenues, k)
+        if prefix_sum - k in freq:
+            count += freq[prefix_sum - k]
 
-    print("Doanh thu từng ngày:", revenues)
-    print("Mục tiêu k:", k)
-    print("Số đoạn ngày liên tiếp có tổng doanh thu bằng k:", result)
+        freq[prefix_sum] = freq.get(prefix_sum, 0) + 1
+
+    return count
 
 
 # ============================================================
@@ -327,7 +321,7 @@ def demo_all_hashing_tools():
     demo_order_hash_table()
     demo_group_coupon_anagrams()
     demo_longest_consecutive_days()
-    demo_count_revenue_windows()
+    count_revenue_windows([100, 200, 300, 100, 200], 300)
     demo_rolling_coupon_search()
 
 

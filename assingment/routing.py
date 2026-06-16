@@ -39,36 +39,29 @@ def build_graph(edges):
     return graph
 
 
+import heapq
+
 def dijkstra(graph, source):
     if source not in graph:
         raise ValueError(f"Source '{source}' không tồn tại trong graph.")
 
-    # Ban đầu, mọi khoảng cách là vô cực
-    dist = {vertex: float("inf") for vertex in graph}
-    parent = {vertex: None for vertex in graph}
+    dist = {v: float("inf") for v in graph}
+    parent = {v: None for v in graph}
 
-    # Đi từ source đến chính nó có chi phí 0
     dist[source] = 0
-
-    # Heap lưu các phần tử dạng (chi_phi_hien_tai, dinh)
     heap = [(0, source)]
 
     while heap:
-        current_cost, u = heapq.heappop(heap)
+        d, u = heapq.heappop(heap)
 
-        # Nếu đây là bản ghi cũ, bỏ qua
-        if current_cost > dist[u]:
+        if d > dist[u]:
             continue
 
-        # Thử đi từ u sang các đỉnh kề v
-        for v, edge_cost in graph[u]:
-            new_cost = current_cost + edge_cost
-
-            # Nếu tìm được đường rẻ hơn để đến v thì cập nhật
-            if new_cost < dist[v]:
-                dist[v] = new_cost
+        for v, w in graph[u]:
+            if dist[v] > dist[u] + w:
+                dist[v] = dist[u] + w
                 parent[v] = u
-                heapq.heappush(heap, (new_cost, v))
+                heapq.heappush(heap, (dist[v], v))
 
     return dist, parent
 
@@ -79,11 +72,9 @@ def shortest_route(graph, source, target):
 
     dist, parent = dijkstra(graph, source)
 
-    # Nếu target vẫn là vô cực nghĩa là không có đường đi
     if dist[target] == float("inf"):
         return float("inf"), []
 
-    # Truy vết đường đi từ target ngược về source
     route = []
     current = target
 
@@ -91,8 +82,11 @@ def shortest_route(graph, source, target):
         route.append(current)
         current = parent[current]
 
-    # Vì truy vết ngược nên cần đảo lại
     route.reverse()
+
+    # đảm bảo đúng start node
+    if route[0] != source:
+        return float("inf"), []
 
     return dist[target], route
 
